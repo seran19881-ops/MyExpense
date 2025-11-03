@@ -4,17 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>MyExpense — Dashboard</title>
-
-  <!-- Chart.js (optional on dashboard, required on analytics) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
-
-  <!-- SheetJS (xlsx) for Excel Export -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-
-  <!-- html2canvas & jsPDF for PDF export -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -23,17 +12,8 @@
     <div class="nav-left">
       <div class="brand">MyExpense</div>
       <ul class="nav-links">
-        <li><a href="index.html" id="nav-dashboard" class="active">Dashboard</a></li>
-        <li><a href="analytics.html" id="nav-analytics">Analytics</a></li>
+        <li><a href="index.html" class="active">Dashboard</a></li>
       </ul>
-    </div>
-
-    <div class="nav-right">
-      <div class="export-buttons">
-        <button id="exportExcel" title="Export visible transactions to Excel">Export Excel</button>
-        <button id="exportPDF" title="Export visible table to PDF">Export PDF</button>
-      </div>
-      <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌗</button>
     </div>
   </nav>
 
@@ -59,21 +39,19 @@
       <h2>Add Transaction</h2>
       <form id="transactionForm">
         <div class="form-grid">
-          <div class="form-row">
-            <label for="type">Type</label>
+          <div>
+            <label>Type</label>
             <select id="type">
               <option value="Expense">Expense</option>
               <option value="Income">Income</option>
             </select>
           </div>
-
-          <div class="form-row">
-            <label for="date">Date</label>
+          <div>
+            <label>Date</label>
             <input type="date" id="date" required />
           </div>
-
-          <div class="form-row">
-            <label for="category">Category</label>
+          <div>
+            <label>Category</label>
             <select id="category">
               <option>Food</option>
               <option>Travel</option>
@@ -83,89 +61,57 @@
               <option>Other</option>
             </select>
           </div>
-
-          <div class="form-row">
-            <label for="description">Description</label>
+          <div>
+            <label>Description</label>
             <input type="text" id="description" placeholder="e.g., lunch, salary" />
           </div>
-
-          <div class="form-row">
-            <label for="amount">Amount (₹)</label>
-            <input type="number" id="amount" min="0" step="0.01" placeholder="0.00" required />
+          <div>
+            <label>Amount (₹)</label>
+            <input type="number" id="amount" min="0" step="0.01" required />
           </div>
         </div>
-
-        <div class="form-row form-actions">
-          <button id="addBtn" type="submit">Add Transaction</button>
-          <button id="updateBtn" type="button" class="hidden">Update</button>
-          <button id="cancelEdit" type="button" class="hidden">Cancel</button>
-        </div>
+        <button type="submit" id="addBtn">Add Transaction</button>
       </form>
     </section>
 
-    <!-- Filters -->
-    <section class="card filters">
-      <div class="filter-row">
-        <label>Filter by Month</label>
-        <input type="month" id="filterMonth" />
-      </div>
-      <div class="filter-row">
-        <label>Filter by Type</label>
-        <select id="filterType">
-          <option value="">All</option>
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
-        </select>
-      </div>
-      <div class="filter-row">
-        <label>Filter by Category</label>
-        <select id="filterCategory">
-          <option value="">All</option>
-          <option>Food</option>
-          <option>Travel</option>
-          <option>Bills</option>
-          <option>Shopping</option>
-          <option>Salary</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="filter-row">
-        <button id="clearFilters">Clear Filters</button>
-      </div>
-    </section>
-
-    <!-- Transactions table -->
-    <section class="card table-card">
+    <!-- Transactions Table -->
+    <section class="card">
       <h2>Transactions</h2>
-      <div class="table-wrap" id="tableWrap">
-        <table id="transactionsTable">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Category</th>
-              <th>Description</th>
-              <th class="right">Amount (₹)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="transactionsTbody"></tbody>
-          <tfoot>
-            <tr>
-              <td colspan="4" class="right">Totals:</td>
-              <td class="right" id="totalsAmount">₹0.00</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="transactionsTbody"></tbody>
+      </table>
     </section>
   </main>
 
   <footer class="footer">
-    <small>MyExpense • Personal Finance Tracker</small>
+    <small>MyExpense • Firebase Version</small>
   </footer>
 
-  <script src="script.js" defer></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCGMiuYt6StgbKkkmM_GPGtUMfL_Qq_UcA",
+      authDomain: "myexpenses126.firebaseapp.com",
+      projectId: "myexpenses126",
+      storageBucket: "myexpenses126.firebasestorage.app",
+      messagingSenderId: "720699475083",
+      appId: "1:720699475083:web:f3582bfb088d35aa48408e",
+      measurementId: "G-Z3QX218PVL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db; // make global
+  </script>
+
+  <script src="script.js" type="module"></script>
 </body>
 </html>
