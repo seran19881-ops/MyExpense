@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MyExpense — Analytics</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+  <!-- SheetJS (xlsx) for Excel Export (optional) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+
+  <!-- html2canvas & jsPDF for PDF export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand">MyExpense</div>
+      <ul class="nav-links">
+        <li><a href="index.html" id="nav-dashboard">Dashboard</a></li>
+        <li><a href="analytics.html" id="nav-analytics" class="active">Analytics</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-right">
+      <div class="export-buttons">
+        <button id="exportExcel" title="Export charts table to Excel">Export Excel</button>
+        <button id="exportPDF" title="Export charts to PDF">Export PDF</button>
+      </div>
+      <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌗</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="card charts-card">
+      <h2>Analytics</h2>
+      <div class="charts-grid">
+        <div class="chart-item card small">
+          <h3>Category-wise Expense</h3>
+          <canvas id="categoryChart" height="220"></canvas>
+        </div>
+
+        <div class="chart-item card small">
+          <h3>Monthly Income vs Expense</h3>
+          <canvas id="monthlyComparisonChart" height="220"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>MyExpense • Analytics</small>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
