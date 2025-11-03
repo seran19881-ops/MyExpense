@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>MyExpense — Personal Expense Tracker</title>
+  <title>MyExpense — Dashboard</title>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Chart.js (optional on dashboard, required on analytics) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 
   <!-- SheetJS (xlsx) for Excel Export -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 
-  <!-- jsPDF + html2canvas for PDF export -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- html2canvas & jsPDF for PDF export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
 
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -23,28 +23,50 @@
     <div class="nav-left">
       <div class="brand">MyExpense</div>
       <ul class="nav-links">
-        <li><a href="#" id="nav-dashboard" class="active">Dashboard</a></li>
-        <li><a href="#" id="nav-analytics">Analytics</a></li>
+        <li><a href="index.html" id="nav-dashboard" class="active">Dashboard</a></li>
+        <li><a href="analytics.html" id="nav-analytics">Analytics</a></li>
       </ul>
     </div>
 
     <div class="nav-right">
       <div class="export-buttons">
-        <button id="exportExcel" title="Export all expenses to Excel">Export Excel</button>
-        <button id="exportPDF" title="Export visible table/chart to PDF">Export PDF</button>
+        <button id="exportExcel" title="Export visible transactions to Excel">Export Excel</button>
+        <button id="exportPDF" title="Export visible table to PDF">Export PDF</button>
       </div>
       <button id="themeToggle" class="theme-toggle" title="Toggle theme">🌗</button>
     </div>
   </nav>
 
-  <!-- Page container -->
   <main class="container">
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="page active-page">
-      <!-- Add expense form (visible top area) -->
-      <section class="card add-expense">
-        <h2>Add Expense</h2>
-        <form id="expenseForm">
+    <!-- Summary cards -->
+    <section class="cards-row">
+      <div class="card summary">
+        <h3>Total Income</h3>
+        <div id="totalIncome" class="big">₹0.00</div>
+      </div>
+      <div class="card summary">
+        <h3>Total Expense</h3>
+        <div id="totalExpense" class="big">₹0.00</div>
+      </div>
+      <div class="card summary">
+        <h3>Balance</h3>
+        <div id="balance" class="big">₹0.00</div>
+      </div>
+    </section>
+
+    <!-- Add transaction form -->
+    <section class="card add-transaction">
+      <h2>Add Transaction</h2>
+      <form id="transactionForm">
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="type">Type</label>
+            <select id="type">
+              <option value="Expense">Expense</option>
+              <option value="Income">Income</option>
+            </select>
+          </div>
+
           <div class="form-row">
             <label for="date">Date</label>
             <input type="date" id="date" required />
@@ -52,106 +74,98 @@
 
           <div class="form-row">
             <label for="category">Category</label>
-            <select id="category" required>
-              <option value="Food">Food</option>
-              <option value="Travel">Travel</option>
-              <option value="Bills">Bills</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Other">Other</option>
+            <select id="category">
+              <option>Food</option>
+              <option>Travel</option>
+              <option>Bills</option>
+              <option>Shopping</option>
+              <option>Salary</option>
+              <option>Other</option>
             </select>
           </div>
 
           <div class="form-row">
             <label for="description">Description</label>
-            <input type="text" id="description" placeholder="e.g., lunch at cafe" />
+            <input type="text" id="description" placeholder="e.g., lunch, salary" />
           </div>
 
           <div class="form-row">
             <label for="amount">Amount (₹)</label>
             <input type="number" id="amount" min="0" step="0.01" placeholder="0.00" required />
           </div>
+        </div>
 
-          <div class="form-row form-actions">
-            <button type="submit" id="addBtn">Add Expense</button>
-            <button type="button" id="updateBtn" class="hidden">Update</button>
-            <button type="button" id="cancelEdit" class="hidden">Cancel</button>
-          </div>
-        </form>
-      </section>
-
-      <!-- Filters -->
-      <section class="card filters">
-        <div class="filter-row">
-          <label>Filter by Month</label>
-          <input type="month" id="filterMonth" />
+        <div class="form-row form-actions">
+          <button id="addBtn" type="submit">Add Transaction</button>
+          <button id="updateBtn" type="button" class="hidden">Update</button>
+          <button id="cancelEdit" type="button" class="hidden">Cancel</button>
         </div>
-        <div class="filter-row">
-          <label>Filter by Category</label>
-          <select id="filterCategory">
-            <option value="">All</option>
-            <option>Food</option>
-            <option>Travel</option>
-            <option>Bills</option>
-            <option>Shopping</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="filter-row">
-          <button id="clearFilters">Clear Filters</button>
-        </div>
-      </section>
-
-      <!-- Expense table -->
-      <section class="card table-card">
-        <h2>Expenses</h2>
-        <div class="table-wrap" id="tableWrap">
-          <table id="expensesTable">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th class="right">Amount (₹)</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="expensesTbody">
-              <!-- rows injected by JS -->
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3" class="right">Total:</td>
-                <td class="right" id="totalAmount">₹0.00</td>
-                <td></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </section>
+      </form>
     </section>
 
-    <!-- Analytics Section -->
-    <section id="analytics" class="page">
-      <section class="card charts-card">
-        <h2>Analytics</h2>
-        <div class="charts-grid">
-          <div class="chart-item card small">
-            <h3>Category Breakdown</h3>
-            <canvas id="categoryChart" height="220"></canvas>
-          </div>
-          <div class="chart-item card small">
-            <h3>Monthly Trend</h3>
-            <canvas id="monthlyChart" height="220"></canvas>
-          </div>
-        </div>
-      </section>
+    <!-- Filters -->
+    <section class="card filters">
+      <div class="filter-row">
+        <label>Filter by Month</label>
+        <input type="month" id="filterMonth" />
+      </div>
+      <div class="filter-row">
+        <label>Filter by Type</label>
+        <select id="filterType">
+          <option value="">All</option>
+          <option value="Income">Income</option>
+          <option value="Expense">Expense</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <label>Filter by Category</label>
+        <select id="filterCategory">
+          <option value="">All</option>
+          <option>Food</option>
+          <option>Travel</option>
+          <option>Bills</option>
+          <option>Shopping</option>
+          <option>Salary</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <button id="clearFilters">Clear Filters</button>
+      </div>
+    </section>
+
+    <!-- Transactions table -->
+    <section class="card table-card">
+      <h2>Transactions</h2>
+      <div class="table-wrap" id="tableWrap">
+        <table id="transactionsTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th class="right">Amount (₹)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTbody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="right">Totals:</td>
+              <td class="right" id="totalsAmount">₹0.00</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </section>
   </main>
 
   <footer class="footer">
-    <small>MyExpense • Personal Expense Tracker</small>
+    <small>MyExpense • Personal Finance Tracker</small>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
