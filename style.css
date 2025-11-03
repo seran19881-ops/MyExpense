@@ -108,14 +108,15 @@ body{
 }
 :root.dark .card{ border:1px solid rgba(255,255,255,0.03) }
 
-/* Add expense form */
-.add-expense h2{ margin:0 0 12px 0; font-size:1.05rem }
-.form-row{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  margin-bottom:12px;
-}
+/* Summary cards */
+.cards-row{ display:flex; gap:12px; margin-bottom:18px; flex-wrap:wrap }
+.summary{ flex:1; min-width:180px; text-align:left }
+.summary .big{ font-size:1.4rem; font-weight:700; margin-top:8px }
+
+/* Form */
+.add-transaction h2{ margin:0 0 12px 0 }
+.form-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:12px }
+.form-row{ display:flex; flex-direction:column; gap:6px; }
 .form-row label{ font-size:0.85rem; color:var(--muted) }
 .form-row input[type="date"],
 .form-row input[type="month"],
@@ -131,7 +132,7 @@ body{
 :root.dark .form-row input,
 :root.dark .form-row select{ border:1px solid rgba(255,255,255,0.04) }
 
-.form-actions{ display:flex; gap:8px; align-items:center }
+.form-actions{ display:flex; gap:8px; align-items:center; margin-top:12px }
 button{
   background:var(--accent-2);
   color:#fff;
@@ -155,16 +156,20 @@ button.secondary{
 /* Table */
 .table-card h2{ margin:0 0 12px 0 }
 .table-wrap{ overflow:auto; max-height:420px; border-radius:8px; background:transparent; padding:6px }
-table{ width:100%; border-collapse:collapse; min-width:720px }
+table{ width:100%; border-collapse:collapse; min-width:800px }
 th,td{ padding:10px 12px; border-bottom:1px solid rgba(0,0,0,0.04); text-align:left; }
 :root.dark th, :root.dark td{ border-bottom:1px solid rgba(255,255,255,0.03) }
 th.right, td.right{ text-align:right }
 .actions button{ margin-right:6px; padding:6px 8px; font-size:0.9rem }
 
+/* Row colors for income/expense */
+.row-income{ background: linear-gradient(90deg, rgba(34,197,94,0.06), transparent) }
+.row-expense{ background: linear-gradient(90deg, rgba(239,68,68,0.04), transparent) }
+
 /* Charts */
 .charts-card h2{ margin-bottom:12px }
 .charts-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px }
-.chart-item{ padding:12px }
+.chart-item{ padding:12px; min-height:260px }
 
 /* Footer */
 .footer{ text-align:center; padding:18px; color:var(--muted) }
@@ -173,15 +178,14 @@ th.right, td.right{ text-align:right }
 @media (max-width:920px){
   .charts-grid{ grid-template-columns: 1fr; }
   .filters{ flex-direction:column; align-items:flex-start }
+  .form-grid{ grid-template-columns: 1fr; }
   .navbar{ padding:0 12px }
 }
-
-/* small extras */
-.small{ padding:12px }
-.right{ text-align:right }
 
 /* Danger button */
 .btn-danger{ background:var(--danger) }
 
 /* helper */
 .hidden{ display:none }
+.right{ text-align:right }
+.small{ padding:12px }
